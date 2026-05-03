@@ -19,393 +19,273 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 import database as db
 import requests
 
-# ⚜️ PAGE CONFIGURATION ⚜️
 st.set_page_config(
-    page_title="👑 SYAPA KING INBOX",
+    page_title="SYAPA KING",
     page_icon="👑",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ⚜️ CUSTOM ROYAL THEME CSS ⚜️
-st.markdown("""
+# ============================================
+#          ROYAL / KINGLY THEME CSS
+# ============================================
+custom_css = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Cinzel:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Great+Vibes&family=Playfair+Display:wght@400;700&display=swap');
 
     * {
         font-family: 'Playfair Display', serif;
     }
 
     .stApp {
-        background: linear-gradient(135deg, #0a0014 0%, #1a0033 30%, #2d0055 60%, #0a0014 100%);
+        background-image: linear-gradient(rgba(20, 0, 40, 0.88), rgba(40, 0, 80, 0.78)),
+                          url('https://i.ibb.co/0mQfX0b/dark-royal-purple-velvet-texture.jpg');
+        background-size: cover;
+        background-position: center;
         background-attachment: fixed;
     }
 
     .main .block-container {
-        background: rgba(20, 5, 40, 0.7);
-        backdrop-filter: blur(20px);
-        border-radius: 25px;
-        padding: 35px;
-        border: 3px solid rgba(255, 215, 0, 0.5);
-        box-shadow: 0 20px 60px rgba(255, 215, 0, 0.2),
-                    0 0 80px rgba(138, 43, 226, 0.1),
-                    inset 0 0 30px rgba(255, 215, 0, 0.05);
+        background: rgba(30, 10, 60, 0.68);
+        backdrop-filter: blur(12px);
+        border-radius: 22px;
+        padding: 32px;
+        border: 2px solid rgba(255, 215, 0, 0.38);
+        box-shadow: 0 12px 45px rgba(255, 215, 0, 0.18),
+                    inset 0 0 28px rgba(255, 215, 0, 0.10);
     }
 
-    /* ROYAL HEADER */
-    .royal-header {
-        background: linear-gradient(135deg, #1a0033 0%, #4b0082 25%, #8b0000 50%, #4b0082 75%, #1a0033 100%);
-        border: 3px solid #ffd700;
-        border-radius: 30px;
-        padding: 3rem;
+    .main-header {
+        background: linear-gradient(135deg, #1a0033, #4b0082, #2a0055);
+        border: 2px solid #ffd700;
+        border-radius: 25px;
+        padding: 2.4rem;
         text-align: center;
-        margin-bottom: 3rem;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8),
-                    0 0 60px rgba(255, 215, 0, 0.4),
-                    inset 0 0 50px rgba(255, 215, 0, 0.15);
+        margin-bottom: 2.8rem;
+        box-shadow: 0 18px 55px rgba(0, 0, 0, 0.75),
+                    0 0 35px rgba(255, 215, 0, 0.30);
         position: relative;
         overflow: hidden;
     }
 
-    .royal-header::before {
+    .main-header::before {
         content: "👑";
         position: absolute;
-        top: -50px;
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 8rem;
-        opacity: 0.15;
-        animation: float 3s ease-in-out infinite;
+        font-size: 6.5rem;
+        opacity: 0.14;
+        color: #ffd700;
     }
 
-    .royal-header::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 300%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
-        animation: shine 4s infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateX(-50%) translateY(0); }
-        50% { transform: translateX(-50%) translateY(-15px); }
-    }
-
-    @keyframes shine {
-        0% { left: -100%; }
-        100% { left: 100%; }
-    }
-
-    .royal-header h1 {
-        background: linear-gradient(180deg, #ffd700 0%, #ffeb3b 30%, #ff8c00 60%, #ffd700 100%);
+    .main-header h1 {
+        background: linear-gradient(90deg, #ffd700, #ffeb3b, #ffd700);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
         font-family: 'Cinzel Decorative', cursive;
-        font-size: 3.8rem;
-        font-weight: 900;
+        font-size: 3.4rem;
+        font-weight: 700;
         margin: 0;
-        text-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
-        letter-spacing: 3px;
+        text-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
     }
 
-    .royal-header p {
+    .main-header p {
         color: #d4af37;
         font-family: 'Great Vibes', cursive;
-        font-size: 2rem;
-        margin-top: 1rem;
-        letter-spacing: 2px;
-        text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        font-size: 1.8rem;
+        margin-top: 0.7rem;
+        letter-spacing: 1.8px;
     }
 
-    /* CROWN LOGO */
-    .crown-logo {
-        width: 100px;
-        height: 100px;
+    .prince-logo {
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        margin-bottom: 25px;
+        margin-bottom: 22px;
         border: 4px solid #ffd700;
-        box-shadow: 0 0 50px rgba(255, 215, 0, 0.9),
-                    0 0 100px rgba(255, 215, 0, 0.4),
-                    inset 0 0 25px rgba(255, 255, 255, 0.3);
-        animation: glow 2s ease-in-out infinite;
+        box-shadow: 0 0 35px rgba(255, 215, 0, 0.8),
+                    inset 0 0 18px rgba(255, 255, 255, 0.35);
     }
 
-    @keyframes glow {
-        0%, 100% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9), 0 0 100px rgba(255, 215, 0, 0.4); }
-        50% { box-shadow: 0 0 80px rgba(255, 215, 0, 1), 0 0 150px rgba(255, 215, 0, 0.7); }
-    }
-
-    /* BUTTONS */
-    .stButton > button {
-        background: linear-gradient(45deg, #8b0000, #b8860b, #ffd700, #b8860b, #8b0000);
-        background-size: 400% 400%;
+    .stButton>button {
+        background: linear-gradient(45deg, #b8860b, #ffd700, #daa520);
         color: #1a0033;
-        border: 2px solid #ffd700;
-        border-radius: 18px;
-        padding: 1.2rem 2.5rem;
-        font-family: 'Cinzel Decorative', cursive;
-        font-weight: 900;
-        font-size: 1.2rem;
-        transition: all 0.5s ease;
-        box-shadow: 0 10px 35px rgba(255, 215, 0, 0.5),
-                    inset 0 0 15px rgba(255, 255, 255, 0.2);
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-        width: 100%;
-        letter-spacing: 2px;
-        animation: buttonShine 3s infinite;
-    }
-
-    @keyframes buttonShine {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-7px) scale(1.03);
-        box-shadow: 0 20px 50px rgba(255, 215, 0, 0.9);
-        border-color: #fff;
-    }
-
-    .stButton > button:active {
-        transform: translateY(-2px);
-    }
-
-    /* STOP BUTTON */
-    .stop-button > button {
-        background: linear-gradient(45deg, #4a0000, #8b0000, #ff0000, #8b0000, #4a0000) !important;
-        background-size: 400% 400% !important;
-        animation: buttonShine 2s infinite !important;
-    }
-
-    /* INPUTS */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea,
-    .stNumberInput > div > div > input {
-        background: rgba(30, 10, 60, 0.85);
         border: 2px solid #b8860b;
-        border-radius: 15px;
+        border-radius: 16px;
+        padding: 1rem 2.4rem;
+        font-family: 'Cinzel Decorative', cursive;
+        font-weight: 700;
+        font-size: 1.2rem;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.45);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        width: 100%;
+    }
+
+    .stButton>button:hover {
+        transform: translateY(-5px) scale(1.04);
+        box-shadow: 0 15px 40px rgba(255, 215, 0, 0.75);
+        background: linear-gradient(45deg, #ffd700, #ffeb3b, #ffd700);
+    }
+
+    .stTextInput>div>div>input,
+    .stTextArea>div>div>textarea,
+    .stNumberInput>div>div>input {
+        background: rgba(40, 20, 80, 0.75);
+        border: 2px solid #b8860b;
+        border-radius: 14px;
         color: #ffd700;
-        padding: 1.2rem;
+        padding: 1rem;
         font-size: 1.1rem;
-        transition: all 0.3s ease;
     }
 
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus {
+    .stTextInput>div>div>input:focus,
+    .stTextArea>div>div>textarea:focus {
         border-color: #ffd700;
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.5),
-                    inset 0 0 15px rgba(255, 215, 0, 0.1);
-        background: rgba(40, 15, 80, 0.95);
+        box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.35);
+        background: rgba(50, 30, 90, 0.85);
     }
 
-    /* FILE UPLOADER */
-    .stFileUploader {
-        background: rgba(30, 10, 60, 0.6);
-        border: 2px dashed #b8860b;
-        border-radius: 15px;
-        padding: 20px;
-    }
-
-    /* LABELS */
-    label, .stMarkdown, p, span {
+    label {
         color: #ffd700 !important;
         font-weight: 600 !important;
-        text-shadow: 1px 1px 3px #000;
+        font-size: 1.15rem !important;
+        text-shadow: 1px 1px 4px #000;
     }
 
-    /* TABS */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(20, 5, 40, 0.8);
-        border-radius: 20px;
+        background: rgba(30, 10, 60, 0.65);
+        border-radius: 16px;
         padding: 10px;
-        border: 2px solid #b8860b;
+        border: 1px solid #b8860b;
     }
 
     .stTabs [data-baseweb="tab"] {
-        background: rgba(75, 0, 130, 0.6);
+        background: rgba(75, 0, 130, 0.55);
         color: #d4af37;
-        border-radius: 15px;
-        padding: 16px 30px;
-        font-weight: 700;
-        font-family: 'Cinzel', serif;
+        border-radius: 12px;
+        padding: 14px 26px;
+        font-weight: 600;
     }
 
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(45deg, #8b0000, #b8860b, #ffd700);
+        background: linear-gradient(45deg, #b8860b, #ffd700);
         color: #1a0033;
-        font-weight: 900;
     }
 
-    /* METRICS */
     [data-testid="stMetricValue"] {
         color: #ffd700;
-        font-size: 2.8rem;
-        font-weight: 900;
-        text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
-        font-family: 'Cinzel Decorative', cursive;
+        font-size: 2.6rem;
+        font-weight: 700;
+        text-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
     }
 
     [data-testid="stMetricLabel"] {
         color: #d4af37;
-        font-weight: 600;
-        font-size: 1rem;
+        font-weight: 500;
     }
 
-    /* METRIC CONTAINER */
-    [data-testid="stMetric"] {
-        background: rgba(30, 10, 60, 0.7);
+    .console-section {
+        background: rgba(20, 0, 40, 0.75);
         border: 2px solid #b8860b;
-        border-radius: 15px;
-        padding: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-radius: 16px;
+        padding: 22px;
+        margin-top: 28px;
     }
 
-    /* CONSOLE */
-    .console-container {
-        background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(10,0,30,0.95));
-        border: 3px solid #ffd700;
-        border-radius: 20px;
-        padding: 25px;
-        margin-top: 30px;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.8),
-                    0 0 30px rgba(255,215,0,0.3),
-                    inset 0 0 20px rgba(75,0,130,0.2);
-    }
-
-    .console-title {
+    .console-header {
         color: #ffd700;
         font-family: 'Cinzel Decorative', cursive;
-        font-size: 1.5rem;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 20px;
-        text-shadow: 0 0 20px #ffd700;
-        letter-spacing: 3px;
+        text-shadow: 0 0 18px #ffd700bb;
+        margin-bottom: 18px;
     }
 
     .console-output {
-        background: #000000;
+        background: #0f001a;
         border: 2px solid #4b0082;
-        border-radius: 15px;
-        padding: 20px;
-        color: #00ff00;
+        border-radius: 14px;
+        padding: 18px;
+        color: #ffeb3b;
         font-family: 'Courier New', monospace;
-        font-size: 13px;
-        max-height: 400px;
+        font-size: 13.5px;
+        max-height: 480px;
         overflow-y: auto;
-        box-shadow: inset 0 0 20px rgba(0,255,0,0.1);
     }
 
     .console-line {
-        padding: 8px 15px;
-        margin: 5px 0;
-        border-left: 3px solid #ffd700;
-        background: rgba(0,30,0,0.5);
-        border-radius: 5px;
-        color: #00ff00;
+        background: rgba(75, 0, 130, 0.25);
+        border-left: 4px solid #ffd700;
+        padding: 9px 14px;
+        margin: 7px 0;
+        color: #ffeb3b;
     }
 
-    .console-line.error {
-        border-left-color: #ff0000;
-        background: rgba(30,0,0,0.5);
-        color: #ff4444;
+    .success-box {
+        background: linear-gradient(135deg, #b8860b, #ffd700);
+        color: #1a0033;
+        border: 2px solid #1a0033;
     }
 
-    .console-line.success {
-        border-left-color: #00ff00;
-        background: rgba(0,30,0,0.5);
-        color: #00ff00;
+    .error-box {
+        background: linear-gradient(135deg, #8b0000, #c71585);
+        border: 2px solid #ffd700;
     }
 
-    /* SIDEBAR */
-    .css-1d391kg {
-        background: rgba(20, 5, 40, 0.95) !important;
-        border-right: 2px solid #b8860b !important;
-    }
-
-    /* WHATSAPP BUTTON */
     .whatsapp-btn {
-        display: inline-block;
-        background: linear-gradient(45deg, #075e54, #128c7e, #25d366);
-        color: white;
+        background: linear-gradient(45deg, #006400, #228b22, #006400);
+        border: 2px solid #ffd700;
+        color: #ffd700;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        box-shadow: 0 8px 25px rgba(0, 100, 0, 0.55);
+        text-decoration: none;
         padding: 15px 30px;
         border-radius: 15px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.2rem;
-        border: 2px solid #ffd700;
-        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5);
-        transition: all 0.3s;
+        display: inline-block;
     }
 
     .whatsapp-btn:hover {
+        background: linear-gradient(45deg, #228b22, #32cd32, #228b22);
         transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(37, 211, 102, 0.8);
+        box-shadow: 0 15px 40px rgba(50, 205, 50, 0.7);
     }
 
-    /* FOOTER */
-    .king-footer {
-        background: rgba(30, 10, 60, 0.8);
-        border-top: 3px solid #ffd700;
+    .footer {
+        background: rgba(30, 10, 60, 0.75);
+        border-top: 3px solid #b8860b;
         color: #d4af37;
         font-family: 'Great Vibes', cursive;
-        font-size: 1.8rem;
-        padding: 3rem;
+        font-size: 1.5rem;
+        padding: 2.8rem;
+        text-shadow: 1px 1px 5px #000;
         text-align: center;
-        text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-        margin-top: 40px;
-        border-radius: 0 0 25px 25px;
-    }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar {
-        width: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #0a0014;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(#8b0000, #b8860b, #ffd700);
-        border-radius: 5px;
-    }
-
-    /* SUCCESS/ERROR/INFO BOXES */
-    .stAlert {
-        border: 2px solid #ffd700 !important;
-        border-radius: 15px !important;
-        font-weight: 600 !important;
-    }
-
-    /* SELECT BOX */
-    .stSelectbox > div > div {
-        background: rgba(30, 10, 60, 0.85);
-        border: 2px solid #b8860b;
-        border-radius: 15px;
     }
 </style>
-""", unsafe_allow_html=True)
+"""
 
-# ⚜️ CONSTANTS ⚜️
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# ============================================
+# CONSTANTS
+# ============================================
 ADMIN_PASSWORD = "SYAPA_KING"
 WHATSAPP_NUMBER = "+92364234209"
 APPROVAL_FILE = "approved_keys.json"
 PENDING_FILE = "pending_approvals.json"
 ADMIN_UID = "Xmarty.Ayush.King.70"
 
-# ⚜️ KEY GENERATION ⚜️
+# ============================================
+# KEY GENERATION
+# ============================================
 def generate_user_key(username, password):
     combined = f"{username}:{password}"
     key_hash = hashlib.sha256(combined.encode()).hexdigest()[:8].upper()
     return f"KEY-{key_hash}"
 
-# ⚜️ APPROVAL SYSTEM FUNCTIONS ⚜️
+# ============================================
+# APPROVAL SYSTEM
+# ============================================
 def load_approved_keys():
     if os.path.exists(APPROVAL_FILE):
         try:
@@ -442,7 +322,9 @@ def check_approval(key):
     approved_keys = load_approved_keys()
     return key in approved_keys
 
-# ⚜️ SESSION STATE INIT ⚜️
+# ============================================
+# SESSION STATE INIT
+# ============================================
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'user_id' not in st.session_state:
@@ -455,14 +337,24 @@ if 'key_approved' not in st.session_state:
     st.session_state.key_approved = False
 if 'approval_status' not in st.session_state:
     st.session_state.approval_status = 'not_requested'
-if 'automation_state' not in st.session_state:
-    st.session_state.automation_state = None
+if 'whatsapp_opened' not in st.session_state:
+    st.session_state.whatsapp_opened = False
 if 'fb_email' not in st.session_state:
     st.session_state.fb_email = ""
 if 'fb_password' not in st.session_state:
     st.session_state.fb_password = ""
+if 'message_link' not in st.session_state:
+    st.session_state.message_link = ""
+if 'delay' not in st.session_state:
+    st.session_state.delay = 5
+if 'messages_list' not in st.session_state:
+    st.session_state.messages_list = ['Hello!']
+if 'name_prefix' not in st.session_state:
+    st.session_state.name_prefix = ""
 
-# ⚜️ AUTOMATION STATE CLASS ⚜️
+# ============================================
+# AUTOMATION STATE CLASS
+# ============================================
 class AutomationState:
     def __init__(self):
         self.running = False
@@ -471,26 +363,30 @@ class AutomationState:
         self.message_rotation_index = 0
         self.stop_requested = False
 
-if 'automation_state' not in st.session_state or st.session_state.automation_state is None:
+if 'automation_state' not in st.session_state:
     st.session_state.automation_state = AutomationState()
 
-# ⚜️ LOG FUNCTION ⚜️
+# ============================================
+# LOG FUNCTION
+# ============================================
 def log_message(msg, msg_type='info'):
     timestamp = time.strftime("%H:%M:%S")
     formatted_msg = f"[{timestamp}] {msg}"
     
     if msg_type == 'error':
-        formatted_msg = f'<div class="console-line error">❌ {formatted_msg}</div>'
+        formatted_msg = f"❌ {formatted_msg}"
     elif msg_type == 'success':
-        formatted_msg = f'<div class="console-line success">✅ {formatted_msg}</div>'
+        formatted_msg = f"✅ {formatted_msg}"
     else:
-        formatted_msg = f'<div class="console-line">🔹 {formatted_msg}</div>'
+        formatted_msg = f"🔹 {formatted_msg}"
     
     st.session_state.automation_state.logs.append(formatted_msg)
 
-# ⚜️ SELENIUM BROWSER SETUP ⚜️
+# ============================================
+# SELENIUM BROWSER SETUP
+# ============================================
 def setup_browser():
-    log_message('Setting up Royal Browser...', 'info')
+    log_message('Setting up Chrome browser...')
     
     chrome_options = Options()
     chrome_options.add_argument('--headless=new')
@@ -500,7 +396,7 @@ def setup_browser():
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--disable-extensions')
     chrome_options.add_argument('--window-size=1920,1080')
-    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36')
     
     chromium_paths = [
         '/usr/bin/chromium',
@@ -512,7 +408,7 @@ def setup_browser():
     for chromium_path in chromium_paths:
         if Path(chromium_path).exists():
             chrome_options.binary_location = chromium_path
-            log_message(f'Found Chromium: {chromium_path}', 'success')
+            log_message(f'Found Chromium at: {chromium_path}', 'success')
             break
     
     chromedriver_paths = [
@@ -524,7 +420,7 @@ def setup_browser():
     for driver_candidate in chromedriver_paths:
         if Path(driver_candidate).exists():
             driver_path = driver_candidate
-            log_message(f'Found ChromeDriver: {driver_path}', 'success')
+            log_message(f'Found ChromeDriver at: {driver_path}', 'success')
             break
     
     try:
@@ -533,88 +429,107 @@ def setup_browser():
         if driver_path:
             service = Service(executable_path=driver_path)
             driver = webdriver.Chrome(service=service, options=chrome_options)
+            log_message('Chrome started with detected ChromeDriver!', 'success')
         else:
             driver = webdriver.Chrome(options=chrome_options)
+            log_message('Chrome started with default driver!', 'success')
         
         driver.set_window_size(1920, 1080)
-        log_message('Royal Browser Ready!', 'success')
+        log_message('Chrome browser setup completed!', 'success')
         return driver
     except Exception as error:
-        log_message(f'Browser Error: {error}', 'error')
+        log_message(f'Browser setup failed: {error}', 'error')
         raise error
 
-# ⚜️ FACEBOOK AUTO LOGIN ⚜️
+# ============================================
+# FACEBOOK AUTO LOGIN
+# ============================================
 def facebook_login(driver, email, password):
-    log_message('Navigating to Facebook...', 'info')
+    log_message('Navigating to Facebook login page...')
     driver.get('https://www.facebook.com/')
     time.sleep(5)
     
     try:
-        log_message('Finding login form...', 'info')
-        
         # Accept cookies if present
         try:
-            cookie_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Allow')]")
-            cookie_btn.click()
-            time.sleep(2)
+            accept_buttons = driver.find_elements(By.XPATH, "//button[contains(text(), 'Allow') or contains(text(), 'Accept')]")
+            for btn in accept_buttons:
+                if btn.is_displayed():
+                    btn.click()
+                    time.sleep(2)
+                    break
         except:
             pass
         
-        # Find email input
-        email_input = WebDriverWait(driver, 10).until(
+        log_message('Entering email...')
+        email_input = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "email"))
         )
+        email_input.clear()
         email_input.send_keys(email)
         log_message('Email entered', 'success')
         
-        # Find password input
+        log_message('Entering password...')
         password_input = driver.find_element(By.ID, "pass")
+        password_input.clear()
         password_input.send_keys(password)
         log_message('Password entered', 'success')
         
-        # Click login button
+        log_message('Clicking login button...')
         login_button = driver.find_element(By.NAME, "login")
         login_button.click()
         log_message('Login button clicked', 'success')
         
-        time.sleep(8)
+        time.sleep(10)
         
-        # Verify login
-        if "facebook.com" in driver.current_url and "login" not in driver.current_url.lower():
-            log_message('Login Successful! 👑', 'success')
-            return True
-        else:
-            log_message('Login may have failed - check credentials', 'error')
+        # Check if login was successful
+        current_url = driver.current_url
+        if "checkpoint" in current_url or "login" in current_url:
+            log_message('Login failed or requires verification', 'error')
             return False
+        else:
+            log_message('Facebook login successful! 👑', 'success')
+            return True
             
     except Exception as e:
-        log_message(f'Login Error: {str(e)[:100]}', 'error')
+        log_message(f'Facebook login error: {str(e)[:100]}', 'error')
         return False
 
-# ⚜️ FIND MESSAGE INPUT ⚜️
+# ============================================
+# FIND MESSAGE INPUT
+# ============================================
 def find_message_input(driver):
-    log_message('Searching for message input...', 'info')
-    time.sleep(5)
+    log_message('Finding message input box...')
+    time.sleep(8)
     
-    selectors = [
+    try:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        driver.execute_script("window.scrollTo(0, 0);")
+        time.sleep(2)
+    except:
+        pass
+    
+    message_input_selectors = [
         'div[contenteditable="true"][role="textbox"]',
         'div[contenteditable="true"]',
         'div[aria-label*="message" i][contenteditable="true"]',
-        'div[aria-label*="Message" i][contenteditable="true"]',
         '[role="textbox"][contenteditable="true"]',
+        '[contenteditable="true"]',
         'textarea',
         'input[type="text"]'
     ]
     
-    for selector in selectors:
+    for selector in message_input_selectors:
         try:
             elements = driver.find_elements(By.CSS_SELECTOR, selector)
+            
             for element in elements:
                 try:
-                    if element.is_displayed() and element.is_enabled():
+                    if element.is_displayed():
                         element.click()
                         time.sleep(0.5)
-                        log_message(f'Message input found! 👑', 'success')
+                        log_message('✅ Found message input!', 'success')
                         return element
                 except:
                     continue
@@ -624,28 +539,34 @@ def find_message_input(driver):
     log_message('Message input not found!', 'error')
     return None
 
-# ⚜️ SEND MESSAGES ⚜️
-def send_messages(driver, message_link, messages_list, delay, name_prefix):
-    log_message(f'Opening conversation...', 'info')
-    driver.get(message_link)
-    time.sleep(8)
+# ============================================
+# GET NEXT MESSAGE
+# ============================================
+def get_next_message(messages_list):
+    if not messages_list or len(messages_list) == 0:
+        return 'Hello!'
     
+    msg_index = st.session_state.automation_state.message_rotation_index % len(messages_list)
+    message = messages_list[msg_index]
+    st.session_state.automation_state.message_rotation_index += 1
+    return message
+
+# ============================================
+# SEND MESSAGES
+# ============================================
+def send_messages(driver, messages_list, delay, name_prefix):
     message_input = find_message_input(driver)
     
     if not message_input:
-        log_message('Cannot find message input! Stopping.', 'error')
+        log_message('Cannot proceed without message input!', 'error')
         return 0
     
     messages_sent = 0
     
     while st.session_state.automation_state.running and not st.session_state.automation_state.stop_requested:
         try:
-            # Get next message
-            msg_index = st.session_state.automation_state.message_rotation_index % len(messages_list)
-            base_message = messages_list[msg_index]
-            st.session_state.automation_state.message_rotation_index += 1
+            base_message = get_next_message(messages_list)
             
-            # Add prefix
             if name_prefix:
                 full_message = f"{name_prefix} {base_message}"
             else:
@@ -653,25 +574,28 @@ def send_messages(driver, message_link, messages_list, delay, name_prefix):
             
             # Type message
             driver.execute_script("""
-                const el = arguments[0];
-                const msg = arguments[1];
-                el.focus();
-                el.click();
-                if (el.tagName === 'DIV') {
-                    el.textContent = msg;
-                    el.innerHTML = msg;
+                const element = arguments[0];
+                const message = arguments[1];
+                
+                element.focus();
+                element.click();
+                
+                if (element.tagName === 'DIV') {
+                    element.textContent = message;
                 } else {
-                    el.value = msg;
+                    element.value = message;
                 }
-                el.dispatchEvent(new Event('input', { bubbles: true }));
+                
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+                element.dispatchEvent(new Event('change', { bubbles: true }));
             """, message_input, full_message)
             
             time.sleep(1)
             
-            # Try to send via button or Enter key
+            # Send message
             send_success = driver.execute_script("""
-                const btns = document.querySelectorAll('[aria-label*="Send"]');
-                for (let btn of btns) {
+                const sendButtons = document.querySelectorAll('[aria-label*="Send"]');
+                for (let btn of sendButtons) {
                     if (btn.offsetParent !== null) {
                         btn.click();
                         return true;
@@ -687,7 +611,7 @@ def send_messages(driver, message_link, messages_list, delay, name_prefix):
             messages_sent += 1
             st.session_state.automation_state.message_count = messages_sent
             
-            log_message(f'Message #{messages_sent} sent: "{full_message[:40]}..." 👑', 'success')
+            log_message(f'Message #{messages_sent} sent 👑', 'success')
             
             time.sleep(delay)
             
@@ -697,34 +621,52 @@ def send_messages(driver, message_link, messages_list, delay, name_prefix):
     
     return messages_sent
 
-# ⚜️ MAIN AUTOMATION FUNCTION ⚜️
-def run_automation(fb_email, fb_password, message_link, messages_list, delay, name_prefix):
+# ============================================
+# MAIN AUTOMATION
+# ============================================
+def run_automation():
     driver = None
     try:
+        log_message('Starting Royal Automation... 👑')
         driver = setup_browser()
         
-        # Login
-        if not facebook_login(driver, fb_email, fb_password):
+        # Facebook Login
+        if not facebook_login(driver, st.session_state.fb_email, st.session_state.fb_password):
+            log_message('Facebook login failed! Stopping.', 'error')
             st.session_state.automation_state.running = False
             return
         
-        # Send messages
-        sent_count = send_messages(driver, message_link, messages_list, delay, name_prefix)
-        
-        log_message(f'Automation complete! Total: {sent_count} messages 👑', 'success')
+        # Navigate to message link
+        if st.session_state.message_link:
+            log_message(f'Opening message link...')
+            driver.get(st.session_state.message_link)
+            time.sleep(8)
+            
+            messages_sent = send_messages(
+                driver,
+                st.session_state.messages_list,
+                st.session_state.delay,
+                st.session_state.name_prefix
+            )
+            
+            log_message(f'Automation complete! Total messages: {messages_sent} 👑', 'success')
+        else:
+            log_message('No message link provided!', 'error')
         
     except Exception as e:
-        log_message(f'Fatal Error: {str(e)}', 'error')
+        log_message(f'Fatal error: {str(e)}', 'error')
     finally:
         if driver:
             try:
                 driver.quit()
-                log_message('Browser closed', 'info')
+                log_message('Browser closed', 'success')
             except:
                 pass
         st.session_state.automation_state.running = False
 
-# ⚜️ START AUTOMATION ⚜️
+# ============================================
+# START / STOP AUTOMATION
+# ============================================
 def start_automation():
     if st.session_state.automation_state.running:
         return
@@ -732,57 +674,48 @@ def start_automation():
     st.session_state.automation_state.running = True
     st.session_state.automation_state.stop_requested = False
     st.session_state.automation_state.message_count = 0
+    st.session_state.automation_state.message_rotation_index = 0
     st.session_state.automation_state.logs = []
     
-    thread = threading.Thread(target=run_automation, args=(
-        st.session_state.fb_email,
-        st.session_state.fb_password,
-        st.session_state.message_link,
-        st.session_state.messages_list,
-        st.session_state.delay,
-        st.session_state.name_prefix
-    ))
+    thread = threading.Thread(target=run_automation)
     thread.daemon = True
     thread.start()
 
-# ⚜️ STOP AUTOMATION ⚜️
 def stop_automation():
     st.session_state.automation_state.stop_requested = True
     st.session_state.automation_state.running = False
-    db.set_automation_running(st.session_state.user_id, False)
+    log_message('⏹️ Automation stop requested!', 'error')
 
-# ⚜️ ADMIN PANEL ⚜️
+# ============================================
+# ADMIN PANEL
+# ============================================
 def admin_panel():
     st.markdown("""
-    <div class="royal-header">
+    <div class="main-header">
+        <img src="https://i.ibb.co/8ghMsS2q/538a21e43b48.jpg" class="prince-logo">
         <h1>👑 ADMIN PANEL 👑</h1>
-        <p>Key Approval Management</p>
+        <p>KEY APPROVAL MANAGEMENT</p>
     </div>
     """, unsafe_allow_html=True)
     
     pending = load_pending_approvals()
     approved_keys = load_approved_keys()
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Approved", len(approved_keys))
-    with col2:
-        st.metric("Pending", len(pending))
-    with col3:
-        st.metric("Total Users", len(approved_keys) + len(pending))
-    
-    st.markdown("---")
+    st.success(f"**Total Approved Keys:** {len(approved_keys)}")
+    st.warning(f"**Pending Approvals:** {len(pending)}")
     
     if pending:
-        st.markdown("### 📋 Pending Approval Requests")
+        st.markdown("#### 📋 Pending Approval Requests")
+        
         for key, info in pending.items():
             col1, col2, col3 = st.columns([2, 2, 1])
+            
             with col1:
-                st.markdown(f"**👤 {info['name']}**")
+                st.text(f"👤 {info['name']}")
             with col2:
-                st.code(key, language=None)
+                st.text(f"🔑 {key}")
             with col3:
-                if st.button("✅ Approve", key=f"approve_{key}"):
+                if st.button("✅", key=f"approve_{key}"):
                     approved_keys[key] = info
                     save_approved_keys(approved_keys)
                     del pending[key]
@@ -790,119 +723,134 @@ def admin_panel():
                     st.success(f"Approved {info['name']}!")
                     st.rerun()
     else:
-        st.info("👑 No pending approvals")
+        st.info("No pending approvals")
     
     if approved_keys:
-        st.markdown("### ✅ Approved Keys")
+        st.markdown("#### ✅ Approved Keys")
         for key, info in approved_keys.items():
-            st.markdown(f"👤 **{info['name']}** - `{key}`")
+            st.text(f"👤 {info['name']} - 🔑 {key}")
     
-    if st.button("🚪 Logout", key="admin_logout"):
+    if st.button("🚪 Logout", key="admin_logout_btn"):
         st.session_state.approval_status = 'login'
         st.rerun()
 
-# ⚜️ APPROVAL REQUEST PAGE ⚜️
+# ============================================
+# APPROVAL REQUEST PAGE
+# ============================================
 def approval_request_page(user_key, username):
     st.markdown("""
-    <div class="royal-header">
-        <h1>🔐 PREMIUM KEY APPROVAL</h1>
-        <p>One Month - 500 RS</p>
+    <div class="main-header">
+        <img src="https://i.ibb.co/8ghMsS2q/538a21e43b48.jpg" class="prince-logo">
+        <h1> PREMIUM KEY APPROVAL REQUIRED </h1>
+        <p>ONE MONTH 500 RS PAID</p>
     </div>
     """, unsafe_allow_html=True)
     
     if st.session_state.approval_status == 'not_requested':
         st.markdown("### 📝 Request Access")
-        st.info(f"**Your Key:** `{user_key}`")
+        st.info(f"**Your Unique Key:** `{user_key}`")
         st.info(f"**Username:** {username}")
         
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([1, 1])
+        
         with col1:
-            if st.button("📤 Request Approval", use_container_width=True):
+            if st.button("📤 Request Approval", use_container_width=True, key="request_approval_btn"):
                 pending = load_pending_approvals()
                 pending[user_key] = {
                     "name": username,
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
                 }
                 save_pending_approvals(pending)
+                
                 st.session_state.approval_status = 'pending'
+                st.session_state.whatsapp_opened = False
                 st.rerun()
+        
         with col2:
-            if st.button("🔐 Admin Panel", use_container_width=True):
+            if st.button("🔐 Admin Panel", use_container_width=True, key="admin_panel_btn"):
                 st.session_state.approval_status = 'admin_login'
                 st.rerun()
     
     elif st.session_state.approval_status == 'pending':
         st.warning("⏳ Approval Pending...")
+        st.info(f"**Your Key:** `{user_key}`")
         
         whatsapp_url = send_whatsapp_message(username, user_key)
         
-        st.markdown(f"""
-        <div style="text-align:center; margin:20px 0;">
-            <a href="{whatsapp_url}" target="_blank" class="whatsapp-btn">
-                📱 Open WhatsApp to Contact Admin
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
+        if not st.session_state.whatsapp_opened:
+            whatsapp_js = f"""
+            <script>
+                setTimeout(function() {{
+                    window.open('{whatsapp_url}', '_blank');
+                }}, 500);
+            </script>
+            """
+            components.html(whatsapp_js, height=0)
+            st.session_state.whatsapp_opened = True
         
-        st.markdown("### 📱 Message Preview:")
-        st.code(f"""👑 HELLO SYAPA KING SIR PLEASE 👑👑
-My name is {username}
-Please approve my key:
-🔑 {user_key}""")
+        st.success(f"📱 WhatsApp opening automatically for: **{username}**")
         
         col1, col2 = st.columns(2)
+        
         with col1:
-            if st.button("🔄 Check Status", use_container_width=True):
+            if st.button("🔄 Check Approval Status", use_container_width=True, key="check_approval_btn"):
                 if check_approval(user_key):
                     st.session_state.key_approved = True
                     st.session_state.approval_status = 'approved'
-                    st.success("Approved! Redirecting...")
+                    st.success("✅ Approved! Redirecting...")
                     time.sleep(1)
                     st.rerun()
                 else:
-                    st.error("Not approved yet!")
+                    st.error("❌ Not approved yet. Please wait!")
+        
         with col2:
-            if st.button("⬅️ Back", use_container_width=True):
+            if st.button("⬅️ Back", use_container_width=True, key="back_btn"):
                 st.session_state.approval_status = 'not_requested'
+                st.session_state.whatsapp_opened = False
                 st.rerun()
     
     elif st.session_state.approval_status == 'admin_login':
         st.markdown("### 🔐 Admin Login")
-        admin_pass = st.text_input("Admin Password:", type="password")
+        
+        admin_password = st.text_input("Enter Admin Password:", type="password", key="admin_password_input")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔓 Login", use_container_width=True):
-                if admin_pass == ADMIN_PASSWORD:
+            if st.button("🔓 Login", use_container_width=True, key="admin_login_btn"):
+                if admin_password == ADMIN_PASSWORD:
                     st.session_state.approval_status = 'admin_panel'
                     st.rerun()
                 else:
-                    st.error("Wrong password!")
+                    st.error("❌ Invalid password!")
+        
         with col2:
-            if st.button("⬅️ Back", use_container_width=True):
+            if st.button("⬅️ Back", use_container_width=True, key="admin_back_btn"):
                 st.session_state.approval_status = 'not_requested'
                 st.rerun()
     
     elif st.session_state.approval_status == 'admin_panel':
         admin_panel()
 
-# ⚜️ LOGIN PAGE ⚜️
+# ============================================
+# LOGIN PAGE
+# ============================================
 def login_page():
     st.markdown("""
-    <div class="royal-header">
-        <h1>👑 SYAPA KING INBOX 👑</h1>
-        <p>Seven Billion Smiles In This World But Your's Is My Favorite ✨</p>
+    <div class="main-header">
+        <img src="https://i.ibb.co/8ghMsS2q/538a21e43b48.jpg" class="prince-logo">
+        <h1>👑SYAPA KING 👑</h1>
+        <p>seven billion smiles in this world but your's is my favorites___👑👑</p>
     </div>
     """, unsafe_allow_html=True)
     
     tab1, tab2 = st.tabs(["🔑 Login", "✨ Sign Up"])
     
     with tab1:
-        st.markdown("### Welcome Back, King!")
-        username = st.text_input("👤 Username", key="login_username", placeholder="Enter your username")
-        password = st.text_input("🔒 Password", key="login_password", type="password", placeholder="Enter your password")
+        st.markdown("### Welcome Back!")
+        username = st.text_input("Username", key="login_username", placeholder="Enter your username")
+        password = st.text_input("Password", key="login_password", type="password", placeholder="Enter your password")
         
-        if st.button("🚀 Login", key="login_btn", use_container_width=True):
+        if st.button("Login", key="login_btn", use_container_width=True):
             if username and password:
                 user_id = db.verify_user(username, password)
                 if user_id:
@@ -923,59 +871,52 @@ def login_page():
                     st.success(f"👑 Welcome back, {username}!")
                     st.rerun()
                 else:
-                    st.error("Invalid credentials!")
+                    st.error("❌ Invalid username or password!")
             else:
-                st.warning("Please fill all fields!")
+                st.warning("⚠️ Please enter both username and password")
     
     with tab2:
-        st.markdown("### Create Your Kingdom")
-        new_username = st.text_input("👤 Choose Username", key="signup_username", placeholder="Choose username")
-        new_password = st.text_input("🔒 Choose Password", key="signup_password", type="password", placeholder="Create password")
-        confirm_password = st.text_input("🔒 Confirm Password", key="confirm_password", type="password", placeholder="Confirm password")
+        st.markdown("### Create New Account")
+        new_username = st.text_input("Choose Username", key="signup_username", placeholder="Choose a unique username")
+        new_password = st.text_input("Choose Password", key="signup_password", type="password", placeholder="Create a strong password")
+        confirm_password = st.text_input("Confirm Password", key="confirm_password", type="password", placeholder="Re-enter your password")
         
-        if st.button("👑 Create Account", key="signup_btn", use_container_width=True):
+        if st.button("Create Account", key="signup_btn", use_container_width=True):
             if new_username and new_password and confirm_password:
                 if new_password == confirm_password:
                     success, message = db.create_user(new_username, new_password)
                     if success:
-                        st.success(f"✅ {message} Please login!")
+                        st.success(f"✅ {message} Please login now!")
                     else:
                         st.error(f"❌ {message}")
                 else:
-                    st.error("Passwords don't match!")
+                    st.error("❌ Passwords do not match!")
             else:
-                st.warning("Please fill all fields!")
+                st.warning("⚠️ Please fill all fields")
 
-# ⚜️ MAIN APP ⚜️
+# ============================================
+# MAIN APP
+# ============================================
 def main_app():
-    # Header
-    st.markdown("""
-    <div class="royal-header">
-        <h1>👑 SYAPA KING INBOX 👑</h1>
-        <p>Automate Your Messages Like Royalty</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="main-header"><img src="https://i.ibb.co/8ghMsS2q/538a21e43b48.jpg" class="prince-logo"><h1>👑 SYAPA KING 👑</h1><p>seven billion smiles in this world but yours is my favorites___👑👑</p></div>', unsafe_allow_html=True)
     
-    # Sidebar
-    with st.sidebar:
-        st.markdown(f"### 👑 {st.session_state.username}")
-        st.markdown(f"**User ID:** {st.session_state.user_id}")
-        st.markdown(f"**Key:** `{st.session_state.user_key}`")
-        st.success("✅ Key Approved")
-        
-        st.markdown("---")
-        
-        if st.button("🚪 Logout", use_container_width=True):
-            if st.session_state.automation_state.running:
-                stop_automation()
-            st.session_state.logged_in = False
-            st.session_state.user_id = None
-            st.session_state.username = None
-            st.session_state.key_approved = False
-            st.session_state.approval_status = 'not_requested'
-            st.rerun()
+    st.sidebar.markdown(f"### 👑 {st.session_state.username}")
+    st.sidebar.markdown(f"**User ID:** {st.session_state.user_id}")
+    st.sidebar.markdown(f"**Key:** `{st.session_state.user_key}`")
+    st.sidebar.success("✅ Key Approved")
     
-    # Main Content
+    if st.sidebar.button("🚪 Logout", use_container_width=True):
+        if st.session_state.automation_state.running:
+            stop_automation()
+        
+        st.session_state.logged_in = False
+        st.session_state.user_id = None
+        st.session_state.username = None
+        st.session_state.user_key = None
+        st.session_state.key_approved = False
+        st.session_state.approval_status = 'not_requested'
+        st.rerun()
+    
     tab1, tab2 = st.tabs(["⚙️ Configuration", "🚀 Automation"])
     
     with tab1:
@@ -985,8 +926,7 @@ def main_app():
         with col1:
             fb_email = st.text_input("📧 Facebook Email/Phone", 
                                      value=st.session_state.get('fb_email', ''),
-                                     placeholder="your@email.com",
-                                     type="default")
+                                     placeholder="your@email.com")
         with col2:
             fb_password = st.text_input("🔒 Facebook Password",
                                         value=st.session_state.get('fb_password', ''),
@@ -994,7 +934,7 @@ def main_app():
                                         type="password")
         
         st.markdown("---")
-        st.markdown("### 🎯 Target Settings")
+        st.markdown("### 🎯 Message Settings")
         
         message_link = st.text_input("🔗 Message Link (Full URL)",
                                      value=st.session_state.get('message_link', ''),
@@ -1010,23 +950,23 @@ def main_app():
                                 value=st.session_state.get('delay', 5))
         
         st.markdown("---")
-        st.markdown("### 📂 Message File")
+        st.markdown("### 📂 Upload Message File (.txt)")
         
-        uploaded_file = st.file_uploader("📁 Upload TXT File", type=['txt'])
+        uploaded_file = st.file_uploader("📁 Choose TXT file", type=['txt'])
         
         if uploaded_file is not None:
-            messages_text = uploaded_file.read().decode('utf-8')
-            st.session_state.messages_list = [msg.strip() for msg in messages_text.split('\n') if msg.strip()]
-            st.success(f"✅ Loaded {len(st.session_state.messages_list)} messages!")
-            
-            with st.expander("👁️ Preview Messages"):
-                for i, msg in enumerate(st.session_state.messages_list[:10]):
-                    st.text(f"{i+1}. {msg}")
-                if len(st.session_state.messages_list) > 10:
-                    st.text(f"... and {len(st.session_state.messages_list) - 10} more")
-        else:
-            if 'messages_list' not in st.session_state:
-                st.session_state.messages_list = ['Hello! 👑']
+            try:
+                messages_text = uploaded_file.read().decode('utf-8')
+                st.session_state.messages_list = [msg.strip() for msg in messages_text.split('\n') if msg.strip()]
+                st.success(f"✅ Loaded {len(st.session_state.messages_list)} messages!")
+                
+                with st.expander("👁️ Preview Messages"):
+                    for i, msg in enumerate(st.session_state.messages_list[:10]):
+                        st.text(f"{i+1}. {msg}")
+                    if len(st.session_state.messages_list) > 10:
+                        st.text(f"... and {len(st.session_state.messages_list) - 10} more")
+            except Exception as e:
+                st.error(f"Error reading file: {e}")
         
         if st.button("💾 Save Configuration", use_container_width=True):
             st.session_state.fb_email = fb_email
@@ -1037,30 +977,24 @@ def main_app():
             st.success("✅ Configuration Saved! 👑")
     
     with tab2:
-        st.markdown("### 🚀 Automation Control Panel")
+        st.markdown("### 🚀 Automation Control")
         
-        # Metrics
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("💬 Messages Sent", st.session_state.automation_state.message_count)
+            st.metric("Messages Sent", st.session_state.automation_state.message_count)
         with col2:
-            status = "🟢 RUNNING" if st.session_state.automation_state.running else "🔴 STOPPED"
-            st.metric("📡 Status", status)
+            status = "🟢 Running" if st.session_state.automation_state.running else "🔴 Stopped"
+            st.metric("Status", status)
         with col3:
             msg_count = len(st.session_state.get('messages_list', []))
-            st.metric("📝 Messages Loaded", msg_count)
-        with col4:
-            st.metric("⏱️ Delay", f"{st.session_state.get('delay', 5)}s")
+            st.metric("Messages Loaded", msg_count)
         
         st.markdown("---")
         
-        # Buttons
         col1, col2 = st.columns(2)
+        
         with col1:
-            if st.button("🚀 START AUTOMATION", 
-                        disabled=st.session_state.automation_state.running,
-                        use_container_width=True,
-                        type="primary"):
+            if st.button("🚀 Start Automation", disabled=st.session_state.automation_state.running, use_container_width=True):
                 if not st.session_state.get('fb_email'):
                     st.error("❌ Please set Facebook Email in Configuration!")
                 elif not st.session_state.get('fb_password'):
@@ -1073,41 +1007,27 @@ def main_app():
                     st.rerun()
         
         with col2:
-            if st.button("🛑 STOP AUTOMATION",
-                        disabled=not st.session_state.automation_state.running,
-                        use_container_width=True,
-                        type="secondary"):
+            if st.button("🛑 Stop Automation", disabled=not st.session_state.automation_state.running, use_container_width=True):
                 stop_automation()
                 st.warning("⏹️ Automation Stopped!")
                 st.rerun()
         
-        st.markdown("---")
-        
-        # Console
         if st.session_state.automation_state.logs:
-            st.markdown("""
-            <div class="console-container">
-                <div class="console-title">👑 LIVE KING CONSOLE 👑</div>
-                <div class="console-output">
-            """, unsafe_allow_html=True)
+            st.markdown("### 👑 Live Console Output")
             
+            logs_html = '<div class="console-output">'
             for log in st.session_state.automation_state.logs[-50:]:
-                st.markdown(log, unsafe_allow_html=True)
+                logs_html += f'<div class="console-line">{log}</div>'
+            logs_html += '</div>'
             
-            st.markdown("</div></div>", unsafe_allow_html=True)
+            st.markdown(logs_html, unsafe_allow_html=True)
             
-            if st.button("🔄 Refresh Console"):
+            if st.button("🔄 Refresh Logs"):
                 st.rerun()
 
-# ⚜️ FOOTER ⚜️
-def show_footer():
-    st.markdown("""
-    <div class="king-footer">
-        👑 Made with Royal Love by Xmarty Ayush King | © 2025 SYAPA KING 👑
-    </div>
-    """, unsafe_allow_html=True)
-
-# ⚜️ MAIN FLOW ⚜️
+# ============================================
+# MAIN ROUTER
+# ============================================
 if not st.session_state.logged_in:
     login_page()
 elif not st.session_state.key_approved:
@@ -1115,4 +1035,4 @@ elif not st.session_state.key_approved:
 else:
     main_app()
 
-show_footer()
+st.markdown('<div class="footer">Made with ❤️ by syapa King | © 2025 SYAPA KING</div>', unsafe_allow_html=True)
