@@ -8,7 +8,6 @@ DB_PATH = Path(__file__).parent / 'users.db'
 ENCRYPTION_KEY_FILE = Path(__file__).parent / '.encryption_key'
 
 def get_encryption_key():
-    """Get or create encryption key for cookie storage"""
     if ENCRYPTION_KEY_FILE.exists():
         with open(ENCRYPTION_KEY_FILE, 'rb') as f:
             return f.read()
@@ -22,14 +21,13 @@ ENCRYPTION_KEY = get_encryption_key()
 cipher_suite = Fernet(ENCRYPTION_KEY)
 
 def init_db():
-    """Initialize database with tables"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -49,64 +47,44 @@ def init_db():
             locked_nicknames TEXT,
             lock_enabled INTEGER DEFAULT 0,
             admin_e2ee_thread_id TEXT,
-            admin_chat_type TEXT DEFAULT 'REGULAR',
+            admin_thread_type TEXT,
+            admin_thread_cookies_encrypted TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
     
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN automation_running INTEGER DEFAULT 0')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
+    # Safe column additions
+    new_columns = [
+        ('automation_running', 'INTEGER DEFAULT 0'),
+        ('locked_group_name', 'TEXT'),
+        ('locked_nicknames', 'TEXT'),
+        ('lock_enabled', 'INTEGER DEFAULT 0'),
+        ('admin_e2ee_thread_id', 'TEXT'),
+        ('admin_thread_type', 'TEXT'),
+        ('admin_thread_cookies_encrypted', 'TEXT'),
+    ]
     
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN locked_group_name TEXT')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN locked_nicknames TEXT')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN lock_enabled INTEGER DEFAULT 0')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN admin_e2ee_thread_id TEXT')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-    
-    try:
-        cursor.execute('ALTER TABLE user_configs ADD COLUMN admin_chat_type TEXT DEFAULT "REGULAR"')
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
+    for col_name, col_def in new_columns:
+        try:
+            cursor.execute(f'ALTER TABLE user_configs ADD COLUMN {col_name} {col_def}')
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
     
     conn.commit()
     conn.close()
 
 def hash_password(password):
-    """Hash password using SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def encrypt_cookies(cookies):
-    """Encrypt cookies for secure storage"""
     if not cookies:
         return None
     return cipher_suite.encrypt(cookies.encode()).decode()
 
 def decrypt_cookies(encrypted_cookies):
-    """Decrypt cookies"""
     if not encrypted_cookies:
         return ""
     try:
@@ -114,15 +92,14 @@ def decrypt_cookies(encrypted_cookies):
     except:
         return ""
 
-def create_user(username, password):
-    """Create new user"""
+def create_user(email, password):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     try:
         password_hash = hash_password(password)
-        cursor.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', 
-                      (username, password_hash))
+        cursor.execute('INSERT INTO users (email, password_hash) VALUES (?, ?)', 
+                      (email, password_hash))
         user_id = cursor.lastrowid
         
         cursor.execute('''
@@ -135,17 +112,16 @@ def create_user(username, password):
         return True, "Account created successfully!"
     except sqlite3.IntegrityError:
         conn.close()
-        return False, "Username already exists!"
+        return False, "Email already registered!"
     except Exception as e:
         conn.close()
         return False, f"Error: {str(e)}"
 
-def verify_user(username, password):
-    """Verify user credentials using SHA-256"""
+def verify_user(email, password):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    cursor.execute('SELECT id, password_hash FROM users WHERE username = ?', (username,))
+    cursor.execute('SELECT id, password_hash FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
     conn.close()
     
@@ -154,7 +130,6 @@ def verify_user(username, password):
     return None
 
 def get_user_config(user_id):
-    """Get user configuration"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -178,7 +153,6 @@ def get_user_config(user_id):
     return None
 
 def update_user_config(user_id, chat_id, name_prefix, delay, cookies, messages):
-    """Update user configuration"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -194,19 +168,17 @@ def update_user_config(user_id, chat_id, name_prefix, delay, cookies, messages):
     conn.commit()
     conn.close()
 
-def get_username(user_id):
-    """Get username by user ID"""
+def get_user_email(user_id):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    cursor.execute('SELECT username FROM users WHERE id = ?', (user_id,))
+    cursor.execute('SELECT email FROM users WHERE id = ?', (user_id,))
     user = cursor.fetchone()
     conn.close()
     
     return user[0] if user else None
 
 def set_automation_running(user_id, is_running):
-    """Set automation running state for a user"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -220,7 +192,6 @@ def set_automation_running(user_id, is_running):
     conn.close()
 
 def get_automation_running(user_id):
-    """Get automation running state for a user"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -231,7 +202,6 @@ def get_automation_running(user_id):
     return bool(result[0]) if result else False
 
 def get_lock_config(user_id):
-    """Get lock configuration for a user"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -260,7 +230,6 @@ def get_lock_config(user_id):
     return None
 
 def update_lock_config(user_id, chat_id, locked_group_name, locked_nicknames, cookies=None):
-    """Update complete lock configuration including chat_id and cookies"""
     import json
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -286,7 +255,6 @@ def update_lock_config(user_id, chat_id, locked_group_name, locked_nicknames, co
     conn.close()
 
 def set_lock_enabled(user_id, enabled):
-    """Enable or disable the lock system"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -300,7 +268,6 @@ def set_lock_enabled(user_id, enabled):
     conn.close()
 
 def get_lock_enabled(user_id):
-    """Check if lock is enabled for a user"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -311,7 +278,6 @@ def get_lock_enabled(user_id):
     return bool(result[0]) if result else False
 
 def get_admin_e2ee_thread_id(user_id):
-    """Get admin E2EE thread ID for a user"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -321,8 +287,7 @@ def get_admin_e2ee_thread_id(user_id):
     
     return result[0] if result and result[0] else None
 
-def set_admin_e2ee_thread_id(user_id, thread_id, cookies, chat_type='REGULAR'):
-    """Set admin E2EE thread ID for a user"""
+def set_admin_e2ee_thread_id(user_id, thread_id, cookies, thread_type='REGULAR'):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -330,9 +295,10 @@ def set_admin_e2ee_thread_id(user_id, thread_id, cookies, chat_type='REGULAR'):
     
     cursor.execute('''
         UPDATE user_configs 
-        SET admin_e2ee_thread_id = ?, cookies_encrypted = ?, admin_chat_type = ?, updated_at = CURRENT_TIMESTAMP
+        SET admin_e2ee_thread_id = ?, admin_thread_type = ?, 
+            admin_thread_cookies_encrypted = ?, updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?
-    ''', (thread_id, encrypted_cookies, chat_type, user_id))
+    ''', (thread_id, thread_type, encrypted_cookies, user_id))
     
     conn.commit()
     conn.close()
